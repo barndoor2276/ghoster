@@ -1,0 +1,19 @@
+{
+  "name": "ghoster",
+  "version": "1.0.0",
+  "description": "Web api app to pass requests from guest vm to host.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/barndoor2276/ghoster.git"
+  },
+  "author": "bbergan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/barndoor2276/ghoster/issues"
+  },
+  "homepage": "https://github.com/barndoor2276/ghoster#readme"
+}
