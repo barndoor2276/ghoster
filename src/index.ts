@@ -9,25 +9,43 @@ var config = require('./config/config.json');
 import DefaultRouter from './routes/defaultRouter';
 import UrlRouter from './routes/urlRouter';
 
-// Create Express Server
-const app = express();
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 /**
- * App Routes - Default
+ * The application class
  */
-app.use('/url', UrlRouter);
+export class App {
+    app: express.Express
+  
+    /**
+     * Initialize the app
+     */
+    constructor() {
+      this.app = express();
+      this.init();
+    };
+  
+    /**
+     * Initialize the app parameters
+     */
+    init() {
+        this.app.use(bodyParser.json());
+        this.app.use(bodyParser.urlencoded({ extended: true }));
+        
+        /**
+         * App Routes - Url
+         */
+        this.app.use('/url', UrlRouter);
+        
+        /**
+         * App Routes - Default
+         * Should be last in the list
+         */
+        this.app.use('/', DefaultRouter);
+        
+        
+        this.app.listen(config.app.port, config.app.ip, function () {
+            logger.info('App listening at ' + config.app.ip + ':' + config.app.port);
+        });
+    };
+}
 
-/**
- * App Routes - Default
- */
-app.use('/', DefaultRouter);
-
-
-app.listen(config.app.port, config.app.ip, function () {
-    logger.info('App listening at ' + config.app.ip + ':' + config.app.port);
-});
-
-export default app;
+export default new App();
