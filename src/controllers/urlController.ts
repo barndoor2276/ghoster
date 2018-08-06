@@ -5,5 +5,5 @@ import { Request, Response } from 'express';
  * Something data
  */
 export let getSomething = (req: Request, res: Response) => {
-    res.status(200).send('{some: "thing"}');
+    res.status(200).send('{some: "url"}');
 };
