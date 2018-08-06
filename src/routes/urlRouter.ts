@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import * as urlController from '../controllers/url';
+import * as urlController from '../controllers/urlController';
 
 export class UrlRouter {
     router: Router
