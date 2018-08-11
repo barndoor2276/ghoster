@@ -5,5 +5,10 @@ import { Request, Response } from 'express';
  * Something data
  */
 export let getSomething = (req: Request, res: Response) => {
-    res.status(200).send('{some: "url"}');
+    var responseJSON = {
+        "body": req.body,
+        "headers": req.headers,
+        "base-url": req.baseUrl
+    }
+    res.status(200).send(responseJSON);
 };

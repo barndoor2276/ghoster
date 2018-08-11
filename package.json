@@ -10,8 +10,8 @@
     "clean": "rm -Rf dist/*",
     "serve": "node dist/index.js",
     "watch-node": "nodemon dist/index.js",
-    "test": "node_modules/mocha/bin/_mocha --recusive --grep *.spec.js dist/",
-    "test-cov": "node node_modules/nyc/bin/nyc.js node_modules/mocha/bin/_mocha --exclude dist/*.spec.js --exclude dist/**/*.spec.js --exit --recursive dist/",
+    "test": "mocha --require ts-node/register --exit src/**/*.spec.ts",
+    "test-cov": "nyc mocha --exclude dist/*.spec.js --exclude dist/**/*.spec.js --exit --recursive dist/",
     "ts-build": "tsc -p tsconfig.test.json",
     "ts-prod": "tsc -p tsconfig.json",
     "ts-watch": "tsc -w",
@@ -44,6 +44,7 @@
     "nyc": "^12.0.2",
     "sinon": "^6.1.4",
     "supertest": "^3.1.0",
+    "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
     "typescript": "^3.0.1"
   },

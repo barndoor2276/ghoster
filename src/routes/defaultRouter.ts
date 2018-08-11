@@ -13,22 +13,13 @@ export class DefaultRouter {
     };
   
     /**
-     * GET something.
-     */
-    public getSomething(req: Request, res: Response, next: NextFunction) {
-        defaultController.getSomething(req, res);
-    };
-  
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
+     * Attach controller functions to router endpoints
      */
     init() {
-      this.router.get('/', this.getSomething);
+      this.router.get('/', defaultController.getSomething);
     };
 }
 
 const defaultRoutes = new DefaultRouter();
-defaultRoutes.init();
 
 export default defaultRoutes.router;

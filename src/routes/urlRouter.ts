@@ -13,22 +13,13 @@ export class UrlRouter {
     };
   
     /**
-     * GET something.
-     */
-    public getSomething(req: Request, res: Response, next: NextFunction) {
-        urlController.getSomething(req, res);
-    };
-  
-    /**
-     * Take each handler, and attach to one of the Express.Router's
-     * endpoints.
+     * Attach controller functions to router endpoints
      */
     init() {
-      this.router.get('/', this.getSomething);
+      this.router.post('/*', urlController.getSomething);
     };
 }
 
 const urlRoutes = new UrlRouter();
-urlRoutes.init();
 
 export default urlRoutes.router;
