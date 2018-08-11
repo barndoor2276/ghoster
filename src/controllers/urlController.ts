@@ -9,6 +9,6 @@ export let getSomething = (req: Request, res: Response) => {
         "body": req.body,
         "headers": req.headers,
         "base-url": req.baseUrl
-    }
-    res.status(200).send(responseJSON);
+    };
+    return res.status(200).send(responseJSON);
 };

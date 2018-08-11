@@ -29,10 +29,11 @@
                 "tdd",
                 "--timeout",
                 "999999",
+                "--require",
+                "ts-node/register",
                 "--colors",
                 "--exit",
-                "--recursive",
-                "${workspaceFolder}/dist"
+                "${workspaceFolder}/src/**/*.spec.ts"
             ],
             "internalConsoleOptions": "openOnSessionStart"
         }

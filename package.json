@@ -1,56 +1,71 @@
 {
-  "name": "ghoster",
-  "version": "1.0.0",
-  "description": "Web api app to pass requests from guest vm to host.",
-  "main": "index.js",
-  "scripts": {
-    "start": "npm run serve",
-    "build": "npm run clean && npm run copy-static-assets && npm run ts-build",
-    "build-prod": "npm run clean && npm run copy-static-assets && npm run ts-prod",
-    "clean": "rm -Rf dist/*",
-    "serve": "node dist/index.js",
-    "watch-node": "nodemon dist/index.js",
-    "test": "mocha --require ts-node/register --exit src/**/*.spec.ts",
-    "test-cov": "nyc mocha --exclude dist/*.spec.js --exclude dist/**/*.spec.js --exit --recursive dist/",
-    "ts-build": "tsc -p tsconfig.test.json",
-    "ts-prod": "tsc -p tsconfig.json",
-    "ts-watch": "tsc -w",
-    "debug": "npm run build && npm run watch-debug",
-    "serve-debug": "nodemon --inspect dist/server.js",
-    "copy-static-assets": "mkdir -p dist/ && cp -Rf src/config/ dist/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/barndoor2276/ghoster.git"
-  },
-  "author": "bbergan",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/barndoor2276/ghoster/issues"
-  },
-  "homepage": "https://github.com/barndoor2276/ghoster#readme",
-  "devDependencies": {
-    "@types/body-parser": "^1.17.0",
-    "@types/chai": "^4.1.4",
-    "@types/express": "^4.16.0",
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^10.5.6",
-    "@types/sinon": "^5.0.1",
-    "@types/supertest": "^2.0.5",
-    "@types/winston": "^2.3.9",
-    "chai": "^4.1.2",
-    "mocha": "^5.2.0",
-    "nodemon": "^1.18.3",
-    "nyc": "^12.0.2",
-    "sinon": "^6.1.4",
-    "supertest": "^3.1.0",
-    "ts-node": "^7.0.0",
-    "tslint": "^5.11.0",
-    "typescript": "^3.0.1"
-  },
-  "dependencies": {
-    "body-parser": "^1.18.3",
-    "express": "^4.16.3",
-    "winston": "^3.0.0"
-  }
+    "name": "ghoster",
+    "version": "1.0.0",
+    "description": "Web api app to pass requests from guest vm to host.",
+    "main": "index.js",
+    "scripts": {
+        "start": "npm run serve",
+        "build": "npm run clean && npm run copy-static-assets && npm run ts-build",
+        "build-prod": "npm run clean && npm run copy-static-assets && npm run ts-prod",
+        "clean": "rm -Rf dist/*",
+        "serve": "node dist/index.js",
+        "watch-node": "nodemon dist/index.js",
+        "test": "mocha",
+        "test-cov": "nyc mocha",
+        "tslint": "tslint -c tslint.json -p tsconfig.json",
+        "ts-build": "tsc -p tsconfig.test.json",
+        "ts-prod": "tsc -p tsconfig.json",
+        "copy-static-assets": "mkdir -p dist/ && cp -Rf src/config/ dist/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/barndoor2276/ghoster.git"
+    },
+    "author": "bbergan",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/barndoor2276/ghoster/issues"
+    },
+    "homepage": "https://github.com/barndoor2276/ghoster#readme",
+    "devDependencies": {
+        "@types/body-parser": "^1.17.0",
+        "@types/chai": "^4.1.4",
+        "@types/express": "^4.16.0",
+        "@types/mocha": "^5.2.5",
+        "@types/node": "^10.5.6",
+        "@types/sinon": "^5.0.1",
+        "@types/supertest": "^2.0.5",
+        "@types/winston": "^2.3.9",
+        "chai": "^4.1.2",
+        "mocha": "^5.2.0",
+        "node-mocks-http": "^1.7.0",
+        "nodemon": "^1.18.3",
+        "nyc": "^12.0.2",
+        "sinon": "^6.1.4",
+        "source-map-support": "^0.5.8",
+        "supertest": "^3.1.0",
+        "ts-node": "^7.0.0",
+        "tslint": "^5.11.0",
+        "typescript": "^3.0.1"
+    },
+    "dependencies": {
+        "body-parser": "^1.18.3",
+        "express": "^4.16.3",
+        "winston": "^3.0.0"
+    },
+    "nyc": {
+        "extension": [
+            ".ts"
+        ],
+        "include": [
+            "src"
+        ],
+        "reporter": [
+            "lcov",
+            "text"
+        ],
+        "temp-directory": "./coverage",
+        "report-dir": "./coverage",
+        "all": true
+    }
 }

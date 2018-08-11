@@ -1,0 +1,9 @@
+###
+### mocha.opts
+###
+
+--require ts-node/register
+--require source-map-support/register
+--exit
+--recursive
+test/src/**/*.spec.ts
