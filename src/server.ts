@@ -6,14 +6,13 @@ import logger from './util/logger';
 // Controllers
 import DefaultRouter from './routes/defaultRouter';
 import UrlRouter from './routes/urlRouter';
-import { CallbackHandler } from 'supertest';
 
 /**
  * The server class
  */
 class Server {
-    express: express.Express;
-    server: HttpServer;
+    private express: express.Express;
+    private server: HttpServer;
   
     /**
      * Initialize the server
@@ -45,7 +44,7 @@ class Server {
     /**
      * Start the server
      */
-    public Start(port: number, hostname: string, cb: CallbackHandler) {
+    public Start(port: number, hostname: string) {
         this.server = this.express.listen(port, hostname, (error: Error) => {
             if (error) {
                 logger.error(error);

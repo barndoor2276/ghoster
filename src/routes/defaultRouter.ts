@@ -1,8 +1,8 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import * as defaultController from '../controllers/defaultController';
 
-export class DefaultRouter {
-    router: Router
+class DefaultRouter {
+    router: Router;
   
     /**
      * Initialize the DefaultRouter
@@ -20,6 +20,4 @@ export class DefaultRouter {
     };
 }
 
-const defaultRoutes = new DefaultRouter();
-
-export default defaultRoutes.router;
+export default new DefaultRouter().router;

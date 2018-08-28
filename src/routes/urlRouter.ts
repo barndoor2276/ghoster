@@ -1,25 +1,25 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import * as urlController from '../controllers/urlController';
+import { Router } from 'express';
+import UrlController from '../controllers/urlController';
 
-export class UrlRouter {
-    router: Router
-  
+class UrlRouter {
+    router: Router;
+
     /**
      * Initialize the UrlRouter
      */
     constructor() {
-      this.router = Router();
-      this.init();
+        this.router = Router();
+        this.init();
     };
-  
+
     /**
      * Attach controller functions to router endpoints
      */
     init() {
-      this.router.post('/*', urlController.getSomething);
+        this.router.get('/*', UrlController.getSomething);
+        this.router.post('/*', UrlController.postSomething);
+        this.router.put('/*', UrlController.putSomething);
     };
 }
 
-const urlRoutes = new UrlRouter();
-
-export default urlRoutes.router;
+export default new UrlRouter().router;

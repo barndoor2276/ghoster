@@ -5,8 +5,9 @@
         "target": "es6",
         "noImplicitAny": true,
         "moduleResolution": "node",
-        "sourceMap": true,
+        "sourceMap": false,
         "outDir": "dist",
+        "removeComments": true,
         "baseUrl": ".",
         "paths": {
             "*": [
@@ -19,7 +20,6 @@
         "src/**/*"
     ],
     "exclude": [
-        "src/*.spec.ts",
-        "src/**/*.spec.ts"
+        "src/config/"
     ]
 }

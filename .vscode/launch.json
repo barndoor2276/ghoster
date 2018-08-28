@@ -25,15 +25,8 @@
             "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
             "preLaunchTask": "build",
             "args": [
-                "-u",
-                "tdd",
-                "--timeout",
-                "999999",
-                "--require",
-                "ts-node/register",
-                "--colors",
-                "--exit",
-                "${workspaceFolder}/src/**/*.spec.ts"
+                "--opts",
+                "mocha.opts"
             ],
             "internalConsoleOptions": "openOnSessionStart"
         }
