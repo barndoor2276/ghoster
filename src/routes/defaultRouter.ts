@@ -1,23 +1,22 @@
-import { Router } from 'express';
-import * as defaultController from '../controllers/defaultController';
+import { DefaultController } from '../controllers';
+import { Router } from './classes';
 
-class DefaultRouter {
-    router: Router;
-  
-    /**
-     * Initialize the DefaultRouter
-     */
-    constructor() {
-      this.router = Router();
-      this.init();
-    };
-  
-    /**
-     * Attach controller functions to router endpoints
-     */
-    init() {
-      this.router.get('/', defaultController.getSomething);
-    };
+class DefaultRouter extends Router {
+      controller: DefaultController;
+    
+      /**
+       * Initialize the DefaultRouter
+       */
+      constructor() {
+        super(new DefaultController());
+      };
+    
+      /**
+       * Attach controller functions to router endpoints
+       */
+      AttachRoutes() {
+        this.router.get('/', this.controller.getSomething);
+      };
 }
 
 export default new DefaultRouter().router;

@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { Controller } from './classes';
 
 /**
  * Url Controller
  * 
  * Receives HTTP requests, re-packages, and then forwards them along.
  */
-class UrlController {
+export default class UrlController extends Controller {
     /**
      * GET something
      * Something data
@@ -22,7 +23,7 @@ class UrlController {
      * POST something
      * Something data
      */
-    postSomething(req: Request, res: Response) {
+    public postSomething(req: Request, res: Response) {
         var responseJSON = {
             "body": req.body,
             "headers": req.headers,
@@ -34,7 +35,7 @@ class UrlController {
      * PUT something
      * Something data
      */
-    putSomething(req: Request, res: Response) {
+    public putSomething(req: Request, res: Response) {
         var responseJSON = {
             "body": req.body,
             "headers": req.headers,
@@ -43,5 +44,3 @@ class UrlController {
         return res.status(200).send(responseJSON);
     }
 }
-
-export default new UrlController();

@@ -1,9 +1,8 @@
 import winston, { createLogger } from "winston";
-import { Logger } from "winston";
 import * as path from 'path';
 import { mkdirSync, existsSync } from 'fs';
 
-var config = require('../config/config.json');
+import config from '../config/config.json'
 
 // Create filelog directory from configuration
 var myTransports = [];

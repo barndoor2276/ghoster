@@ -1,11 +1,10 @@
+import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import { Server as HttpServer } from 'http';
-import bodyParser from 'body-parser';
+import config from './config/config.json';
+import * as routers from './routes';
 import logger from './util/logger';
-
-// Controllers
-import DefaultRouter from './routes/defaultRouter';
-import UrlRouter from './routes/urlRouter';
 
 /**
  * The server class
@@ -28,17 +27,18 @@ class Server {
     private MountRoutes() {
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: true }));
+        this.express.use(cors({ exposedHeaders: config.corsHeaders }));
         
         /**
          * App Routes - Url
          */
-        this.express.use('/url', UrlRouter);
+        this.express.use('/url', routers.urlRouter);
         
         /**
          * App Routes - Default
          * Should be last in the list
          */
-        this.express.use('/', DefaultRouter);
+        this.express.use('/', routers.defaultRouter);
     }
 
     /**

@@ -1,6 +1,6 @@
 import server from './server';
+import config from './config/config.json';
 
-const config = require('./config/config.json');
-const port = process.env.PORT || config.app.port;
+const port = config.app.port;
 
 server.Start(port, config.app.ip);
