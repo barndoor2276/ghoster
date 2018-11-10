@@ -1,24 +1,20 @@
 import { UrlController } from '../controllers';
 import { Router } from './classes';
 
-class UrlRouter extends Router {
+export default class UrlRouter extends Router {
     controller: UrlController;
 
     /**
      * Initialize the UrlRouter
      */
-    constructor() {
-        super(new UrlController());
+    constructor(controller: UrlController) {
+        super(controller);
     }
 
     /**
      * Attach controller functions to router endpoints
      */
     AttachRoutes() {
-        this.router.get('/*', this.controller.getSomething);
-        this.router.post('/*', this.controller.postSomething);
-        this.router.put('/*', this.controller.putSomething);
+        this.router.all('/*', this.controller.passthrough);
     }
 }
-
-export default new UrlRouter().getRouter();

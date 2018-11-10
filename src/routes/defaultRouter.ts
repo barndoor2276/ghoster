@@ -1,15 +1,15 @@
 import { DefaultController } from '../controllers';
 import { Router } from './classes';
 
-class DefaultRouter extends Router {
+export default class DefaultRouter extends Router {
       controller: DefaultController;
     
       /**
        * Initialize the DefaultRouter
        */
-      constructor() {
-        super(new DefaultController());
-      };
+      constructor(controller: DefaultController) {
+        super(controller);
+    }
     
       /**
        * Attach controller functions to router endpoints
@@ -18,5 +18,3 @@ class DefaultRouter extends Router {
         this.router.get('/', this.controller.getSomething);
       };
 }
-
-export default new DefaultRouter().router;

@@ -1,46 +1,38 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Controller } from './classes';
-
+import http from 'http';
+import https from 'https';
+import { IConfig } from '../config/IConfig';
+import { Logger as winstonLogger, loggers } from 'winston'
+import { Logger } from '../util/logger';
 /**
  * Url Controller
  * 
  * Receives HTTP requests, re-packages, and then forwards them along.
  */
 export default class UrlController extends Controller {
-    /**
-     * GET something
-     * Something data
-     */
-    public getSomething(req: Request, res: Response) {
-        var responseJSON = {
-            "body": req.body,
-            "headers": req.headers,
-            "base-url": req.baseUrl
-        };
-        return res.status(200).send(responseJSON);
+
+    constructor() {
+        super();
+        this.passthrough = this.passthrough.bind(this);
     }
-    /**
-     * POST something
-     * Something data
-     */
-    public postSomething(req: Request, res: Response) {
-        var responseJSON = {
-            "body": req.body,
-            "headers": req.headers,
-            "base-url": req.baseUrl
-        };
-        return res.status(200).send(responseJSON);
-    }
-    /**
-     * PUT something
-     * Something data
-     */
-    public putSomething(req: Request, res: Response) {
-        var responseJSON = {
-            "body": req.body,
-            "headers": req.headers,
-            "base-url": req.baseUrl
-        };
-        return res.status(200).send(responseJSON);
+
+    public passthrough(req: Request, res: Response, next: NextFunction) {
+        if(req.protocol == "http") {
+            this.connection.httpRequest(req, res)
+            .then((data) => {
+                res.status(200).send({
+                    message: "success",
+                    data: data
+                });
+            })
+            .catch((error: Error) => {
+                this.logger.error(error.message);
+                res.status(500).send({
+                    message: "failure",
+                    error: error
+                });
+            })
+        }
     }
 }

@@ -1,7 +1,13 @@
+import { IConfig } from './IConfig';
+
 export default {
     app: {
-        port: 5000,
+        port: 9999,
         ip: "127.0.0.1"
+    },
+    targetapp: {
+        port: 6000,
+        ip: "192.168.1.143"
     },
     corsHeaders: ["Link"],
     winston: {
@@ -23,4 +29,4 @@ export default {
             }
         }]
     }
-}
+} as IConfig
