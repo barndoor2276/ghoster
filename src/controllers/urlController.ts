@@ -18,21 +18,19 @@ export default class UrlController extends Controller {
     }
 
     public passthrough(req: Request, res: Response, next: NextFunction) {
-        if(req.protocol == "http") {
-            this.connection.httpRequest(req, res)
-            .then((data) => {
-                res.status(200).send({
-                    message: "success",
-                    data: data
-                });
-            })
-            .catch((error: Error) => {
-                this.logger.error(error.message);
-                res.status(500).send({
-                    message: "failure",
-                    error: error
-                });
-            })
-        }
+        this.connection.makeRequest(req, res)
+        .then((data) => {
+            res.status(200).send({
+                message: "success",
+                data: data
+            });
+        })
+        .catch((error: Error) => {
+            this.logger.error(error.message);
+            res.status(500).send({
+                message: "failure",
+                error: error
+            });
+        });
     }
 }

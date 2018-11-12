@@ -33,6 +33,9 @@ class Server {
      * Initialize the server parameters
      */
     private MountRoutes() {
+        /**
+         * Middleware
+         */
         this.express.use(this.bodyParser.json());
         this.express.use(this.bodyParser.urlencoded({ extended: true }));
         this.express.use(this.cors({ exposedHeaders: this.config.corsHeaders }));
@@ -45,13 +48,11 @@ class Server {
          * App Routes - Url
          */
         this.express.use('/url', new routers.urlRouter(new controllers.UrlController()).getRouter());
-        
-        /**
-         * App Routes - Default
-         * Should be last in the list
-         */
         this.express.use('/', new routers.defaultRouter(new controllers.DefaultController()).getRouter());
 
+        /**
+         * ErrorHandler Middleware ** Must be last!
+         */
         this.express.use(function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
             res.status(500).send({ message: err.message });
         });

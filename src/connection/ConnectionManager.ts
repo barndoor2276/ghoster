@@ -1,10 +1,11 @@
-import { IConnectionManager } from "./IConnectionManager";
-import http from "http";
-import https from "https";
-import { IConfig } from "../config/IConfig";
-import { Logger as winstonLogger } from "winston"
-import { Logger } from '../util/logger';
 import { Request, Response } from 'express';
+import { readFile } from 'fs';
+import http, { ClientRequest } from "http";
+import https from "https";
+import { Logger as winstonLogger } from "winston";
+import { IConfig } from "../config/IConfig";
+import { Logger } from '../util/logger';
+import { IConnectionManager } from "./IConnectionManager";
 
 export class ConnectionManager implements IConnectionManager {
     config: IConfig;
@@ -15,45 +16,58 @@ export class ConnectionManager implements IConnectionManager {
         this.logger = new Logger().defaultLogger();
     }
 
-    httpRequest(incoming: Request, outgoing: Response): Promise<any> {
+    makeRequest(incoming: Request, outgoing: Response): Promise<any> {
         return new Promise((resolve, reject) => {
-            var options = {
-                hostname: this.config.targetapp.ip,
-                host: this.config.targetapp.ip,
+            
+            var options: any = {
                 port: this.config.targetapp.port,
                 method: incoming.method,
-                path: incoming.originalUrl,
-                headers: incoming.headers
+                path: this.config.targetapp.basePath + incoming.originalUrl,
+                headers: {
+                    "connection": incoming.headers.connection
+                }
             };
 
-            const request = http.request(options, (response) => {
-                var body: any[] = [];
-                response.on('data', (chunk) => {
-                    body.push(chunk);
+            if(this.config.targetapp.caFile) {
+                readFile(this.config.targetapp.caFile, (err, data) => {
+                    if (err) {
+                        this.logger.error("Could not read caFile: " + err);
+                        reject(err);
+                    } else {
+                        options.ca = data;
+                    }
                 });
-                response.on('error', (error) => {
-                    this.logger.error("got error" + error);
-                    reject(error);
-                });
-                response.on('end', () => {
-                    resolve(JSON.parse(body.join('')));
-                });
-            });
-            
+            }
+
+            if(!this.config.targetapp.hostname) {
+                options.host = this.config.targetapp.host;
+            } else {
+                options.hostname = this.config.targetapp.hostname;
+            }
+
+            if(incoming.headers.authorization) {
+                options.headers["Authorization"] = incoming.headers.authorization;
+            }
+
+            var request: ClientRequest;
+            if(this.config.targetapp.useHttps) {
+                request = http.request(options, resolve);
+            } else {
+                request = https.request(options, resolve);
+            }
+
             request.on('error', (err) => {
                 this.logger.error("error in request: " + err.message);
                 reject(err);
             });
 
             if(Object.keys(incoming.body).length != 0) {
+                request.setHeader("Content-Type", incoming.headers["content-type"]);
+                request.setHeader("Content-Length", JSON.stringify(incoming.body).length);
                 request.write(JSON.stringify(incoming.body));
             }
 
             request.end();
         });
-    }
-
-    httpsRequest(): Promise<any> {
-        throw new Error('not implemented');
     }
 }

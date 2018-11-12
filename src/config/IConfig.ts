@@ -5,6 +5,11 @@ export interface IConfig {
     },
     targetapp: {
         port: number,
+        host: string,
+        hostname: string,
+        basePath: string,
+        useHttps: boolean,
+        caFile: string,
         ip: string
     },
     corsHeaders: string[],
