@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { IncomingMessage } from 'http';
 import { Controller } from './classes';
+import { ITargetApp } from '../config/ITargetApp';
+import { Logger } from 'winston';
 /**
  * Url Controller
  * 
@@ -8,13 +10,13 @@ import { Controller } from './classes';
  */
 export default class UrlController extends Controller {
 
-    constructor() {
-        super();
+    constructor(target: ITargetApp, logger: Logger) {
+        super(target, logger);
         this.passthrough = this.passthrough.bind(this);
     }
 
     public passthrough(req: Request, res: Response, next: NextFunction) {
-        this.connection.makeRequest(req, res)
+        this.connection.makeRequest(req, res, this.target)
         .then((response: IncomingMessage) => {
             var data: any[] = [];
             response.on('data', (chunk: any): void => {

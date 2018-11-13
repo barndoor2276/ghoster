@@ -1,30 +1,33 @@
 import express, { Request, Response, Express, NextFunction } from 'express';
-import { Server as HttpServer } from 'http';
+import http from 'http';
+import https from 'https';
 import * as routers from './routes';
 import * as controllers from './controllers'
 import { Logger } from './util/logger';
 import { Logger as winstonLogger } from 'winston';
 import { IConfig } from './config/IConfig';
+import { ITargetApp } from './config/ITargetApp';
 
 /**
  * The server class
  */
-class Server {
+export class Server {
     private bodyParser: any;
     private config: IConfig;
     private cors: any;
     private express: Express;
     private logger: winstonLogger;
-    private server: HttpServer;
+    private target: ITargetApp;
   
     /**
      * Initialize the server
      */
-    constructor(app: Express) {
+    constructor(config: IConfig, target: ITargetApp) {
         this.bodyParser = require('body-parser');
-        this.config = require('./config/config.json').default;
+        this.target = target;
+        this.config = config;
         this.cors = require('cors');
-        this.express = app;
+        this.express = express();
         this.logger = new Logger().defaultLogger();
         this.MountRoutes();
     }
@@ -47,7 +50,7 @@ class Server {
         /**
          * App Routes - Url
          */
-        this.express.use('/', new routers.urlRouter(new controllers.UrlController()).getRouter());
+        this.express.use('/', new routers.urlRouter(new controllers.UrlController(this.target, this.logger)).getRouter());
         // this.express.use('/', new routers.defaultRouter(new controllers.DefaultController()).getRouter());
 
         /**
@@ -64,23 +67,12 @@ class Server {
     public Start(port: number, hostname: string) {
         process.on('uncaughtException', (err) => {
             this.logger.error('global exception: ' + err.message);
-        })
-        this.server = this.express.listen(port, hostname, (error: Error) => {
+        });
+        this.express.listen(port, hostname, (error: Error) => {
             if (error) {
                 this.logger.error(error);
             }
-            this.logger.info('App listening at ' + hostname + ':' + port);
-        });
-    }
-
-    /**
-     * Stop the server
-     */
-    public Stop() {
-        this.server.close(() => {
-            this.logger.info('App closed');
+            this.logger.info(`${this.target.name} listening at ` + hostname + ':' + port);
         });
     }
 }
-
-export default new Server(express());

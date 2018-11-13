@@ -6,39 +6,38 @@ import { Logger as winstonLogger } from "winston";
 import { IConfig } from "../config/IConfig";
 import { Logger } from '../util/logger';
 import { IConnectionManager } from "./IConnectionManager";
+import { ITargetApp } from '../config/ITargetApp';
 
 export class ConnectionManager implements IConnectionManager {
-    config: IConfig;
     logger: winstonLogger;
 
-    constructor() {
-        this.config = require("../config/config.json").default;
-        this.logger = new Logger().defaultLogger();
+    constructor(logger: winstonLogger) {
+        this.logger = logger;
     }
 
-    makeRequest(incoming: Request, outgoing: Response): Promise<any> {
+    makeRequest(incoming: Request, outgoing: Response, target: ITargetApp): Promise<any> {
         return new Promise((resolve, reject) => {
 
             var request: ClientRequest;
             
-            if(this.config.targetapp.useHttps) {
+            if(target.useHttps) {
                 var httpsOptions: https.RequestOptions = {
-                    host: this.config.targetapp.host,
-                    port: this.config.targetapp.port,
+                    host: target.host,
+                    port: target.port,
                     method: incoming.method,
                     path: incoming.originalUrl
                 };
     
-                if(this.config.targetapp.caFile) {
-                    httpsOptions.ca = readFileSync(this.config.targetapp.caFile);
+                if(target.caFile) {
+                    httpsOptions.ca = readFileSync(target.caFile);
                 }
                 this.logger.info(`Outgoing: [${httpsOptions.method} https://${httpsOptions.host}${httpsOptions.path}]`);
                 request = https.request(httpsOptions, resolve);
             }
             else {
                 var httpOptions: http.RequestOptions = {
-                    host: this.config.targetapp.host,
-                    port: this.config.targetapp.port,
+                    host: target.host,
+                    port: target.port,
                     method: incoming.method,
                     path: incoming.originalUrl
                 };
