@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { readFile } from 'fs';
+import { readFileSync } from 'fs';
 import http, { ClientRequest } from "http";
 import https from "https";
 import { Logger as winstonLogger } from "winston";
@@ -18,52 +18,46 @@ export class ConnectionManager implements IConnectionManager {
 
     makeRequest(incoming: Request, outgoing: Response): Promise<any> {
         return new Promise((resolve, reject) => {
-            
-            var options: any = {
-                port: this.config.targetapp.port,
-                method: incoming.method,
-                path: this.config.targetapp.basePath + incoming.originalUrl,
-                headers: {
-                    "connection": incoming.headers.connection
-                }
-            };
-
-            if(this.config.targetapp.caFile) {
-                readFile(this.config.targetapp.caFile, (err, data) => {
-                    if (err) {
-                        this.logger.error("Could not read caFile: " + err);
-                        reject(err);
-                    } else {
-                        options.ca = data;
-                    }
-                });
-            }
-
-            if(!this.config.targetapp.hostname) {
-                options.host = this.config.targetapp.host;
-            } else {
-                options.hostname = this.config.targetapp.hostname;
-            }
-
-            if(incoming.headers.authorization) {
-                options.headers["Authorization"] = incoming.headers.authorization;
-            }
 
             var request: ClientRequest;
+            
             if(this.config.targetapp.useHttps) {
-                request = http.request(options, resolve);
-            } else {
-                request = https.request(options, resolve);
+                var httpsOptions: https.RequestOptions = {
+                    host: this.config.targetapp.host,
+                    port: this.config.targetapp.port,
+                    method: incoming.method,
+                    path: incoming.originalUrl
+                };
+    
+                if(this.config.targetapp.caFile) {
+                    httpsOptions.ca = readFileSync(this.config.targetapp.caFile);
+                }
+                this.logger.info(`Outgoing: [${httpsOptions.method} https://${httpsOptions.host}${httpsOptions.path}]`);
+                request = https.request(httpsOptions, resolve);
+            }
+            else {
+                var httpOptions: http.RequestOptions = {
+                    host: this.config.targetapp.host,
+                    port: this.config.targetapp.port,
+                    method: incoming.method,
+                    path: incoming.originalUrl
+                };
+                this.logger.info(`Outgoing: [${httpOptions.method} http://${httpOptions.host}${httpOptions.path}]`);
+                request = http.request(httpOptions, resolve);
+            }            
+
+            if(incoming.headers.authorization) {
+                request.setHeader("Authorization", incoming.headers.authorization);
             }
 
-            request.on('error', (err) => {
+            request.on('error', (err: Error) => {
                 this.logger.error("error in request: " + err.message);
                 reject(err);
             });
 
             if(Object.keys(incoming.body).length != 0) {
                 request.setHeader("Content-Type", incoming.headers["content-type"]);
-                request.setHeader("Content-Length", JSON.stringify(incoming.body).length);
+                request.setHeader("Content-Length", incoming.body.length || 0);
                 request.write(JSON.stringify(incoming.body));
             }
 

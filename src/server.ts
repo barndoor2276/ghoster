@@ -47,8 +47,8 @@ class Server {
         /**
          * App Routes - Url
          */
-        this.express.use('/url', new routers.urlRouter(new controllers.UrlController()).getRouter());
-        this.express.use('/', new routers.defaultRouter(new controllers.DefaultController()).getRouter());
+        this.express.use('/', new routers.urlRouter(new controllers.UrlController()).getRouter());
+        // this.express.use('/', new routers.defaultRouter(new controllers.DefaultController()).getRouter());
 
         /**
          * ErrorHandler Middleware ** Must be last!

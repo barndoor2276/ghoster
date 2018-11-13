@@ -8,7 +8,7 @@
         "start": "npm run serve",
         "build": "npm run clean && npm run copy-static-assets && npm run ts-build",
         "build-prod": "npm run clean && npm run copy-static-assets && npm run ts-prod && npm prune --production",
-        "clean": "rm -Rf dist/*",
+        "clean": "shx rm -Rf dist/*",
         "serve": "node dist/index.js",
         "prewatch": "npm run build",
         "watch": "nodemon",
@@ -17,7 +17,7 @@
         "tslint": "tslint -c tslint.json -p tsconfig.json",
         "ts-build": "tsc -p tsconfig.test.json",
         "ts-prod": "tsc -p tsconfig.json",
-        "copy-static-assets": "mkdir -p dist/ && cp -Rf src/config/ dist/"
+        "copy-static-assets": "shx mkdir -p dist/ && shx cp -Rf src/config/ dist/"
     },
     "repository": {
         "type": "git",
@@ -46,6 +46,7 @@
         "nodemon": "^1.18.3",
         "nyc": "^12.0.2",
         "proxyquire": "^2.0.1",
+        "shx": "^0.3.2",
         "sinon": "^6.1.4",
         "source-map-support": "^0.5.8",
         "supertest": "^3.1.0",

@@ -1,10 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import { IncomingMessage } from 'http';
 import { Controller } from './classes';
-import http from 'http';
-import https from 'https';
-import { IConfig } from '../config/IConfig';
-import { Logger as winstonLogger, loggers } from 'winston'
-import { Logger } from '../util/logger';
 /**
  * Url Controller
  * 
@@ -19,17 +15,21 @@ export default class UrlController extends Controller {
 
     public passthrough(req: Request, res: Response, next: NextFunction) {
         this.connection.makeRequest(req, res)
-        .then((data) => {
-            res.status(200).send({
-                message: "success",
-                data: data
+        .then((response: IncomingMessage) => {
+            var data: any[] = [];
+            response.on('data', (chunk: any): void => {
+                data.push(chunk);
             });
+            response.on('end', (): void => {
+                res.status(response.statusCode)
+                    .send(response.statusMessage);
+            })
         })
         .catch((error: Error) => {
             this.logger.error(error.message);
             res.status(500).send({
                 message: "failure",
-                error: error
+                error: error.message
             });
         });
     }

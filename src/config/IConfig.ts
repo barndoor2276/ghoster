@@ -1,12 +1,11 @@
 export interface IConfig {
     app: {
         port: number,
-        ip: string
+        host: string
     },
     targetapp: {
         port: number,
         host: string,
-        hostname: string,
         basePath: string,
         useHttps: boolean,
         caFile: string,
