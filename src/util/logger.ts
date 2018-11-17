@@ -2,6 +2,7 @@ import winston, { createLogger, Logger as winstonLogger } from "winston";
 import * as path from 'path';
 import { mkdirSync, existsSync } from 'fs';
 import { IConfig } from "../config/IConfig.js";
+import { ITargetApp } from "../config/ITargetApp.js";
 
 export class Logger {
 
@@ -9,9 +10,11 @@ export class Logger {
     private myTransports: any[] = [];
     private logger: winstonLogger;
     private config: IConfig;
+    private target: ITargetApp;
 
-    constructor() {
-        this.config = require('../config/config.json').default;
+    constructor(target: ITargetApp, config: IConfig) {
+        this.target = target;
+        this.config = config;
 
         for (let i of this.config.winston.transports) {
             if (i.type === 'file') {
@@ -31,11 +34,21 @@ export class Logger {
             }
         }
 
+        const myFormat = winston.format.printf(info => {
+            return `${info.level}-${info.label}: ${info.myTime}  [ ${info.message} ]`;
+        });
+
         // Create the winston log transports
         this.logger = createLogger({
             transports: this.myTransports,
             format: winston.format.combine(
-                winston.format.simple()
+                winston.format.colorize(),
+                winston.format.label({ label: `${this.target.name}` }),
+                winston.format.timestamp({
+                    format: 'YYYY-MM-DD_HH:mm:ss',
+                    alias: 'myTime',
+                }),
+                myFormat
             )
         });
     }

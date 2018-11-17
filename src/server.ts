@@ -1,6 +1,5 @@
 import express, { Request, Response, Express, NextFunction } from 'express';
-import http from 'http';
-import https from 'https';
+import ip from "ip";
 import * as routers from './routes';
 import * as controllers from './controllers'
 import { Logger } from './util/logger';
@@ -28,7 +27,7 @@ export class Server {
         this.config = config;
         this.cors = require('cors');
         this.express = express();
-        this.logger = new Logger().defaultLogger();
+        this.logger = new Logger(this.target, this.config).defaultLogger();
         this.MountRoutes();
     }
   
@@ -68,11 +67,11 @@ export class Server {
         process.on('uncaughtException', (err) => {
             this.logger.error('global exception: ' + err.message);
         });
-        this.express.listen(port, hostname, (error: Error) => {
+        this.express.listen(port, ip.address(), (error: Error) => {
             if (error) {
                 this.logger.error(error);
             }
-            this.logger.info(`${this.target.name} listening at ` + hostname + ':' + port);
+            this.logger.info(`Listening at ` + ip.address() + ':' + port);
         });
     }
 }
