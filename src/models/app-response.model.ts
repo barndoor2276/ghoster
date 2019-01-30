@@ -1,8 +1,8 @@
-export default interface AppResponse {
-    req: {
-        hostname: string,
-        baseUrl: string,
-        headers: {},
-        body: {}
-    }
+export interface AppResponse {
+	req: {
+		hostname: string,
+		baseUrl: string,
+		headers: {},
+		body: {}
+	}
 }

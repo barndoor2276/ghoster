@@ -3,19 +3,19 @@ import { IRouter } from "./IRouter";
 import { Controller } from '../../controllers/classes';
 
 
-export default abstract class Router implements IRouter {
-    router: expressRouter;
-    controller: Controller;
+export abstract class Router implements IRouter {
+	router: expressRouter;
+	controller: Controller;
 
-    constructor(controller: Controller) {
-        this.router = expressRouter();
-        this.controller = controller;
-        this.AttachRoutes();
-    }
+	constructor(controller: Controller) {
+		this.router = expressRouter();
+		this.controller = controller;
+		this.AttachRoutes();
+	}
 
-    getRouter(): expressRouter {
-        return this.router;
-    }
+	getRouter(): expressRouter {
+		return this.router;
+	}
 
-    abstract AttachRoutes(): void;
+	abstract AttachRoutes(): void;
 }

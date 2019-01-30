@@ -1,59 +1,55 @@
 import winston, { createLogger, Logger as winstonLogger } from "winston";
-import * as path from 'path';
+import { dirname } from 'path';
 import { mkdirSync, existsSync } from 'fs';
-import { IConfig } from "../config/IConfig.js";
-import { ITargetApp } from "../config/ITargetApp.js";
+import { IConfig } from "../models/config/IConfig.js";
+import { Config } from "./config";
 
 export class Logger {
 
-    // Create filelog directory from configuration
-    private myTransports: any[] = [];
-    private logger: winstonLogger;
-    private config: IConfig;
-    private target: ITargetApp;
+	private myTransports: any[] = [];
+	private logger: winstonLogger;
+	private config: IConfig;
 
-    constructor(target: ITargetApp, config: IConfig) {
-        this.target = target;
-        this.config = config;
+	constructor() {
+		this.config = new Config().getConfig();
 
-        for (let i of this.config.winston.transports) {
-            if (i.type === 'file') {
-                this.myTransports.push(new winston.transports.File(i.options));        
-                try { 
-                    if(!existsSync(path.dirname(i.options["filename"]))) {
-                        mkdirSync(path.dirname(i.options.filename));
-                    }
-                }
-                catch (ex) {
-                    console.error('Error creating Winston file log directory.');
-                    console.error(ex.message);
-                }
-            }
-            else if (i.type === 'console') {
-                this.myTransports.push(new winston.transports.Console(i.options));  
-            }
-        }
+		for (let i of this.config.winston.transports) {
+			if (i.type === 'file') {
+				try {
+					if (!existsSync(dirname(i.options["filename"]))) {
+						mkdirSync(dirname(i.options.filename));
+					}
+					this.myTransports.push(new winston.transports.File(i.options));
+				}
+				catch (ex) {
+					console.error('Error creating Winston file log directory.');
+					console.error(ex.message);
+				}
+			}
+			else if (i.type === 'console') {
+				this.myTransports.push(new winston.transports.Console(i.options));
+			}
+		}
 
-        const myFormat = winston.format.printf(info => {
-            return `${info.level}-${info.label}: ${info.myTime}  [ ${info.message} ]`;
-        });
+		const myFormat = winston.format.printf(info => {
+			return `${info.level}: ${info.myTime}  [ ${info.message} ]`;
+		});
 
-        // Create the winston log transports
-        this.logger = createLogger({
-            transports: this.myTransports,
-            format: winston.format.combine(
-                winston.format.colorize(),
-                winston.format.label({ label: `${this.target.name}` }),
-                winston.format.timestamp({
-                    format: 'YYYY-MM-DD_HH:mm:ss',
-                    alias: 'myTime',
-                }),
-                myFormat
-            )
-        });
-    }
+		// Create the winston log transports
+		this.logger = createLogger({
+			transports: this.myTransports,
+			format: winston.format.combine(
+				winston.format.colorize(),
+				winston.format.timestamp({
+					format: 'YYYY-MM-DD_HH:mm:ss',
+					alias: 'myTime',
+				}),
+				myFormat
+			)
+		});
+	}
 
-    public defaultLogger(): winstonLogger {
-        return this.logger;
-    }
+	public defaultLogger(): winstonLogger {
+		return this.logger;
+	}
 }

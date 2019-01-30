@@ -1,15 +1,13 @@
-import { Logger as winstonLogger, loggers } from 'winston'
+import { Logger as winstonLogger } from 'winston'
 import { IController } from './IController';
-import { IConfig } from '../../config/IConfig';
-import { ITargetApp } from '../../config/ITargetApp';
+import { IConfig } from '../../models/config/IConfig';
 import { IConnectionManager } from '../../connection/IConnectionManager';
 
 /**
  * IController interface for custom controller
  */
 export interface IController {
-    config: IConfig;
-    target: ITargetApp;
-    connection: IConnectionManager;
-    logger: winstonLogger;
+	config: IConfig;
+	connection: IConnectionManager;
+	logger: winstonLogger;
 }

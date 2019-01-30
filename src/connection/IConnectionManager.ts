@@ -1,10 +1,10 @@
-import { IConfig } from "../config/IConfig";
+import { IConfig } from "../models/config/IConfig";
 import { Logger as winstonLogger } from "winston";
 import { Request, Response } from 'express';
 import { RequestOptions } from "http";
-import { ITargetApp } from "../config/ITargetApp";
+import { ITargetApp } from "../models/config/ITargetApp";
 
 export interface IConnectionManager {
-    logger: winstonLogger;
-    makeRequest(incoming: Request, outgoing: Response, target: ITargetApp): Promise<any>;
+	logger: winstonLogger;
+	makeRequest(incoming: Request, outgoing: Response, target: ITargetApp): Promise<any>;
 }

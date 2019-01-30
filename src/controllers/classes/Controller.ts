@@ -1,25 +1,23 @@
-import { IConfig } from '../../config/IConfig';
+import { IConfig } from '../../models/config/IConfig';
 import { Logger as winstonLogger } from 'winston'
 import { Logger } from '../../util/logger';
 import { IController } from './IController';
 import { IConnectionManager } from '../../connection/IConnectionManager';
 import { ConnectionManager } from '../../connection/ConnectionManager';
-import { ITargetApp } from '../../config/ITargetApp';
+import { default as Config } from '../../util/config';
 
 /**
  * Controller base class for custom controller
  */
-export default abstract class Controller implements IController {
+export abstract class Controller implements IController {
 
-    config: IConfig;
-    target: ITargetApp;
-    connection: IConnectionManager;
-    logger: winstonLogger;
+	config: IConfig;
+	connection: IConnectionManager;
+	logger: winstonLogger;
 
-    constructor(target: ITargetApp, logger: winstonLogger) {
-        this.config = require('../../config/config.json').default;
-        this.target = target;
-        this.logger = logger;
-        this.connection = new ConnectionManager(this.logger);
-    }
+	constructor() {
+		this.config = Config;
+		this.logger = new Logger().defaultLogger();
+		this.connection = new ConnectionManager();
+	}
 }
