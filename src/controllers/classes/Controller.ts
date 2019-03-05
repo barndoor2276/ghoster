@@ -1,10 +1,9 @@
 import { IConfig } from '../../models/config/IConfig';
 import { Logger as winstonLogger } from 'winston'
-import { Logger } from '../../util/logger';
+import { Logger } from '../../modules/logger/logger';
 import { IController } from './IController';
-import { IConnectionManager } from '../../connection/IConnectionManager';
-import { ConnectionManager } from '../../connection/ConnectionManager';
-import { default as Config } from '../../util/config';
+import { ConnectionManager } from '../../modules/connection/';
+import { default as Config } from '../../modules/config/config';
 
 /**
  * Controller base class for custom controller
@@ -12,7 +11,7 @@ import { default as Config } from '../../util/config';
 export abstract class Controller implements IController {
 
 	config: IConfig;
-	connection: IConnectionManager;
+	connection: ConnectionManager;
 	logger: winstonLogger;
 
 	constructor() {

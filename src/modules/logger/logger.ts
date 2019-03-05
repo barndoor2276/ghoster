@@ -1,8 +1,8 @@
 import winston, { createLogger, Logger as winstonLogger } from "winston";
 import { dirname } from 'path';
 import { mkdirSync, existsSync } from 'fs';
-import { IConfig } from "../models/config/IConfig.js";
-import { Config } from "./config";
+import { IConfig } from "../../models/config/IConfig.js";
+import { Config } from "../config/config";
 
 export class Logger {
 

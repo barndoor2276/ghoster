@@ -1,21 +1,21 @@
 import express, { Request, Response, Express, NextFunction } from 'express';
-import ip from "ip";
 import * as routers from './routes';
-import * as controllers from './controllers'
-import { Logger } from './util/logger';
+import { Logger } from './modules/logger/logger';
 import { Logger as winstonLogger } from 'winston';
 import { IConfig } from './models/config/IConfig';
-import { default as config } from './util/config';
+import { default as config } from './modules/config/config';
+import { Server as httpServer } from 'http';
 
 /**
- * The server class
+ * The App class
  */
-export class Server {
+export class App {
 	private bodyParser: any;
 	private config: IConfig;
 	private cors: any;
 	private express: Express;
 	private logger: winstonLogger;
+	private server: httpServer;
 
     /**
      * Initialize the server
@@ -40,7 +40,7 @@ export class Server {
 		this.express.use(this.bodyParser.urlencoded({ extended: true }));
 		this.express.use(this.cors({ exposedHeaders: this.config.corsHeaders }));
 		this.express.use((req, res, next) => {
-			this.logger.info(`Incoming: [${req.method} ${req.protocol}://${req.ip}:${req.path}]`);
+			this.logger.info(`Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`);
 			next();
 		});
 
@@ -65,11 +65,24 @@ export class Server {
 		process.on('uncaughtException', (err) => {
 			this.logger.error('global exception: ' + err.message);
 		});
-		this.express.listen(this.config.app.port, ip.address(), (error: Error) => {
+		this.server = this.express.listen(this.config.app.port, this.config.app.host, (error: Error) => {
 			if (error) {
 				this.logger.error(error);
 			}
-			this.logger.info(`Listening at ` + ip.address() + ':' + this.config.app.port);
+			this.logger.info(`Listening at ` + this.config.app.host + ':' + this.config.app.port);
 		});
+	}
+
+	/**
+	 * Stop the server
+	 */
+	public Stop() {
+		this.server.close(() => {
+			this.logger.info("The server has stopped.");
+		});
+	}
+
+	public GetServer() {
+		return this.server;
 	}
 }

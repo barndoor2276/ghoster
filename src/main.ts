@@ -1,5 +1,5 @@
-import { Server } from './server';
+import { App } from './app';
 
-var server: Server = new Server();
+var server: App = new App();
 
 server.Start();
