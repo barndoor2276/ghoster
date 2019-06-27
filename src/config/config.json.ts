@@ -4,7 +4,7 @@ import { ITargetApp } from '../models/config/ITargetApp';
 export default {
 	app: {
 		port: 9990,
-		host: "192.168.253.109"
+		host: "192.168.253.137"
 	},
 	targetapp: {
 		name: "app1",

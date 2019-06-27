@@ -1,9 +1,0 @@
-###
-### mocha.opts
-###
-
---colors
---require ts-node/register
---require source-map-support/register
---exit
-./src/**/*.spec.ts

@@ -30,6 +30,7 @@ export class UrlController extends Controller {
 					res.status(response.statusCode).send(JSON.parse(data.join("")));
 				} catch (error) {
 					this.logger.warn(`Could not parse JSON. Sending raw data.`);
+					this.logger.warn(data.join(""));
 					res.status(response.statusCode).send(data.join(""));
 				}
 			});
