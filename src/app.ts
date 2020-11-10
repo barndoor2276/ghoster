@@ -1,10 +1,12 @@
-import express, { Request, Response, Express, NextFunction } from 'express';
 import * as routers from './routes';
-import { Logger } from './modules/logger/logger';
-import { Logger as winstonLogger } from 'winston';
+
+import express, { Express, NextFunction, Request, Response } from 'express';
+
 import { IConfig } from './models/config/IConfig';
+import { Logger } from './modules/';
 import { default as config } from './modules/config/config';
 import { Server as httpServer } from 'http';
+import { Logger as winstonLogger } from 'winston';
 
 /**
  * The App class
@@ -17,9 +19,9 @@ export class App {
 	private logger: winstonLogger;
 	private server: httpServer;
 
-    /**
-     * Initialize the server
-     */
+	/**
+	 * Initialize the server
+	 */
 	constructor() {
 		this.bodyParser = require('body-parser');
 		this.config = config;
@@ -29,13 +31,13 @@ export class App {
 		this.MountRoutes();
 	}
 
-    /**
-     * Initialize the server parameters
-     */
+	/**
+	 * Initialize the server parameters
+	 */
 	private MountRoutes() {
-        /**
-         * Middleware
-         */
+		/**
+		 * Middleware
+		 */
 		this.express.use(this.bodyParser.json());
 		this.express.use(this.bodyParser.urlencoded({ extended: true }));
 		this.express.use(this.cors({ exposedHeaders: this.config.corsHeaders }));
@@ -44,32 +46,32 @@ export class App {
 			next();
 		});
 
-        /**
-         * App Routes - Url
-         */
+		/**
+		 * App Routes - Url
+		 */
 		this.express.use('/', new routers.UrlRouter().getRouter());
 		// this.express.use('/', new routers.defaultRouter(new controllers.DefaultController()).getRouter());
 
-        /**
-         * ErrorHandler Middleware ** Must be last!
-         */
+		/**
+		 * ErrorHandler Middleware ** Must be last!
+		 */
 		this.express.use(function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
 			res.status(500).send({ message: err.message });
 		});
 	}
 
-    /**
-     * Start the server
-     */
+	/**
+	 * Start the server
+	 */
 	public Start() {
 		process.on('uncaughtException', (err) => {
 			this.logger.error('global exception: ' + err.message);
 		});
-		this.server = this.express.listen(this.config.app.port, this.config.app.host, (error: Error) => {
+		this.server = this.express.listen(this.config.app.port, (error: Error) => {
 			if (error) {
 				this.logger.error(error);
 			}
-			this.logger.info(`Listening at ` + this.config.app.host + ':' + this.config.app.port);
+			this.logger.info(`Listening on port ${this.config.app.port}`);
 		});
 	}
 

@@ -2,13 +2,11 @@ import { IConfig } from "../../models/config/IConfig";
 
 export class Config {
 	private static config: IConfig;
-	constructor() {
+	public static getConfig(): IConfig {
 		if (!Config.config) {
-			Config.config = require('../../config/config.json');
+			Config.config = require('../../config/config.json').default;
 		}
-	}
-	getConfig(): IConfig {
 		return Config.config;
 	}
 }
-export default new Config().getConfig();
+export default Config.getConfig();

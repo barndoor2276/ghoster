@@ -3,8 +3,7 @@ import { ITargetApp } from '../models/config/ITargetApp';
 
 export default {
 	app: {
-		port: 9990,
-		host: "192.168.253.137"
+		port: 8008
 	},
 	targetapp: {
 		name: "app1",
@@ -33,5 +32,6 @@ export default {
 					tailable: true
 				}
 			}]
-	}
+	},
+	cloner: './cloner'
 } as IConfig

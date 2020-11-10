@@ -1,8 +1,9 @@
+import { existsSync, mkdirSync } from 'fs';
 import winston, { createLogger, Logger as winstonLogger } from "winston";
-import { dirname } from 'path';
-import { mkdirSync, existsSync } from 'fs';
-import { IConfig } from "../../models/config/IConfig.js";
+
 import { Config } from "../config/config";
+import { IConfig } from "../../models/config/IConfig.js";
+import { dirname } from 'path';
 
 export class Logger {
 
@@ -11,7 +12,8 @@ export class Logger {
 	private config: IConfig;
 
 	constructor() {
-		this.config = new Config().getConfig();
+		this.config = Config.getConfig();
+		console.info(this.config);
 
 		for (let i of this.config.winston.transports) {
 			if (i.type === 'file') {
