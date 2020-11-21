@@ -33,6 +33,7 @@
         "@types/body-parser": "^1.17.0",
         "@types/cors": "^2.8.4",
         "@types/express": "^4.16.0",
+        "@types/http-proxy-middleware": "^0.19.3",
         "@types/node": "^10.17.44",
         "@types/winston": "^2.3.9",
         "nodemon": "^2.0.2",
@@ -47,6 +48,7 @@
         "body-parser": "^1.18.3",
         "cors": "^2.8.5",
         "express": "^4.16.3",
+        "http-proxy-middleware": "^1.0.6",
         "winston": "^3.0.0"
     }
 }

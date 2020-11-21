@@ -1,10 +1,10 @@
-import { ITargetApp } from './ITargetApp';
+import { ServerOptions } from 'http-proxy';
 
 export interface IConfig {
 	app: {
 		port: number
 	},
-	targetapp: ITargetApp,
+	serverOptions: ServerOptions
 	corsHeaders: string[],
 	winston: {
 		transports: any[]

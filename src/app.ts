@@ -1,11 +1,11 @@
-import * as routers from './routes';
-
+import { IncomingMessage, Server as httpServer } from 'http';
 import express, { Express, NextFunction, Request, Response } from 'express';
 
+import { Cloner } from './modules/cloner/cloner';
 import { IConfig } from './models/config/IConfig';
-import { Logger } from './modules/';
+import { Logger } from './modules/logger/logger';
 import { default as config } from './modules/config/config';
-import { Server as httpServer } from 'http';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { Logger as winstonLogger } from 'winston';
 
 /**
@@ -13,6 +13,7 @@ import { Logger as winstonLogger } from 'winston';
  */
 export class App {
 	private bodyParser: any;
+	private cloner: Cloner;
 	private config: IConfig;
 	private cors: any;
 	private express: Express;
@@ -28,6 +29,7 @@ export class App {
 		this.cors = require('cors');
 		this.express = express();
 		this.logger = new Logger().defaultLogger();
+		this.cloner = new Cloner();
 		this.MountRoutes();
 	}
 
@@ -45,17 +47,24 @@ export class App {
 			this.logger.info(`Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`);
 			next();
 		});
-
-		/**
-		 * App Routes - Url
-		 */
-		this.express.use('/', new routers.UrlRouter().getRouter());
-		// this.express.use('/', new routers.defaultRouter(new controllers.DefaultController()).getRouter());
+		this.express.use('/', createProxyMiddleware({
+			logProvider: (provider) => this.logger,
+			target: this.config.serverOptions.target,
+			changeOrigin: true,
+			secure: false,
+			onProxyRes: (proxyRes: IncomingMessage, req: Request, res: Response) => {
+				this.logger.info(proxyRes.statusCode.toString());
+				let data: any[] = [];
+				proxyRes.on('data', chunk => data.push(chunk));
+				proxyRes.on('end', () => this.cloner.clone(req, proxyRes.statusCode, data.join('')));
+			}
+		}));
 
 		/**
 		 * ErrorHandler Middleware ** Must be last!
 		 */
-		this.express.use(function errorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
+		this.express.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+			this.logger.error(err);
 			res.status(500).send({ message: err.message });
 		});
 	}
@@ -70,8 +79,9 @@ export class App {
 		this.server = this.express.listen(this.config.app.port, (error: Error) => {
 			if (error) {
 				this.logger.error(error);
+			} else {
+				this.logger.info(`Listening on port ${this.config.app.port}`);
 			}
-			this.logger.info(`Listening on port ${this.config.app.port}`);
 		});
 	}
 

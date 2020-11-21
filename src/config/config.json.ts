@@ -1,18 +1,13 @@
 import { IConfig } from '../models/config/IConfig';
-import { ITargetApp } from '../models/config/ITargetApp';
+import { resolve } from 'path';
 
 export default {
 	app: {
 		port: 8008
 	},
-	targetapp: {
-		name: "app1",
-		port: 443,
-		host: "vmtass-k009.api-wi.com",
-		basePath: "/APIHC/TASS/WAS/WAS_2016_5_Device/",
-		useHttps: true,
-		caFile: "/Users/212688906/Shared/Augustus_CA_Chain_Base64_exp_2019_10_20.pem"
-	} as ITargetApp,
+	serverOptions: {
+		target: 'https://vmtass-m17.api-wi.com/APIHC/TASS/WAS/v2020_testing1_Staging_WAS/',
+	},
 	corsHeaders: ["Link"],
 	winston: {
 		transports:
@@ -33,5 +28,5 @@ export default {
 				}
 			}]
 	},
-	cloner: './cloner'
+	cloner: resolve('cloner')
 } as IConfig
