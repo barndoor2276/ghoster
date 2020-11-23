@@ -3,4 +3,4 @@ bin/
 coverage/
 dist/
 node_modules/
-cloner/
+./cloner/

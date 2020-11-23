@@ -1,11 +1,12 @@
+import { Request, Response } from 'express';
 import { exists, mkdir, stat, writeFile } from '../fs/fs-promises';
 
 import { Config } from "../config/config";
 import { IConfig } from '../../models/config/IConfig';
+import { IncomingMessage } from 'http';
 import { Logger } from '../logger/logger';
-import { Request } from 'express';
-import { ServerResponses } from '../../models/server-responses';
 import { Logger as WinstonLogger } from 'winston'
+import deepmerge from 'deepmerge';
 import path from 'path';
 
 export class Cloner {
@@ -18,28 +19,42 @@ export class Cloner {
 		mkdir(this.config.cloner, { recursive: true }).catch((err) => { });
 	}
 
-	public async clone(req: Request, statusCode: number, data: string) {
+	public async clone(proxyRes: IncomingMessage, req: Request, res: Response) {
 
-		const clonePath = path.join(this.config.cloner, req.path);
-		const resPath = path.join(clonePath, `${req.method.toLowerCase()}.json`);
-		await mkdir(clonePath, { recursive: true });
+		const statusCode = proxyRes.statusCode;
+		const data = await new Promise(resolve => {
+			let chunks: any[] = [];
+			proxyRes.on('data', chunk => chunks.push(chunk));
+			proxyRes.on('end', () => resolve(chunks.join('')));
+		});
 
+		const resPath = path.join(this.config.cloner, `${this.config.targetName}.json`);
+
+		let file: any;
 		if (await exists(resPath)) {
-			let file: ServerResponses = require(resPath);
-			file.responses.push({
-				headers: req.headers,
-				statusCode: statusCode,
-				data: data
-			});
-			await writeFile(resPath, JSON.stringify(file, null, 4)).catch((err) => this.logger.error(err));
+			file = require(resPath);
 		} else {
-			await writeFile(resPath, JSON.stringify({
-				responses: [{
+			file = {};
+		}
+
+		let responseObj: any = {
+			responses: {
+				[req.method.toLowerCase()]: {
 					headers: req.headers,
 					statusCode: statusCode,
 					data: data
-				}]
-			} as ServerResponses, null, 4)).catch((err) => this.logger.error(err));
-		}
+				}
+			}
+		};
+
+		req.path.split('/').reverse().forEach((part, index, array) => {
+			if (part) {
+				responseObj = {
+					[part]: responseObj
+				}
+			}
+		});
+
+		await writeFile(resPath, JSON.stringify(deepmerge(responseObj, file), null, 4)).catch((err) => this.logger.error(err));
 	}
 }

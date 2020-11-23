@@ -4,6 +4,7 @@ export interface IConfig {
 	app: {
 		port: number
 	},
+	targetName: string,
 	serverOptions: ServerOptions
 	corsHeaders: string[],
 	winston: {

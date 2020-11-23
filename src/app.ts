@@ -47,17 +47,13 @@ export class App {
 			this.logger.info(`Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`);
 			next();
 		});
+
 		this.express.use('/', createProxyMiddleware({
 			logProvider: (provider) => this.logger,
 			target: this.config.serverOptions.target,
 			changeOrigin: true,
 			secure: false,
-			onProxyRes: (proxyRes: IncomingMessage, req: Request, res: Response) => {
-				this.logger.info(proxyRes.statusCode.toString());
-				let data: any[] = [];
-				proxyRes.on('data', chunk => data.push(chunk));
-				proxyRes.on('end', () => this.cloner.clone(req, proxyRes.statusCode, data.join('')));
-			}
+			onProxyRes: (proxyRes: IncomingMessage, req: Request, res: Response) => this.cloner.clone(proxyRes, req, res)
 		}));
 
 		/**
