@@ -1,11 +1,13 @@
-import { IncomingMessage, Server as httpServer } from "http";
+import { Server as httpServer } from "http";
 import express, { Express, NextFunction, Request, Response } from "express";
-import { json, urlencoded } from "body-parser";
 import { Cloner } from "./modules/cloner/cloner";
 import { IConfig } from "./models/config/config";
 import { Logger } from "./modules/logger/logger";
 import config from "./modules/config/config";
-import { createProxyMiddleware } from "http-proxy-middleware";
+import {
+  createProxyMiddleware,
+  responseInterceptor,
+} from "http-proxy-middleware";
 import { Logger as winstonLogger } from "winston";
 import cors from "cors";
 
@@ -27,10 +29,10 @@ export class App {
       this.logger.error("global exception: " + err.message);
     });
 
-    this.config = config;
     this.express = express();
-    this.logger = new Logger().defaultLogger();
-    this.cloner = new Cloner();
+    this.config = config;
+    this.logger = new Logger(this.config).defaultLogger();
+    this.cloner = new Cloner(this.config, this.logger);
     this.MountRoutes();
   }
 
@@ -41,25 +43,39 @@ export class App {
     /**
      * Middleware
      */
-    this.express.use(json());
-    this.express.use(urlencoded({ extended: true }));
+    this.express.use(express.json());
+    this.express.use(express.urlencoded({ extended: false }));
     this.express.use(cors({ exposedHeaders: this.config.corsHeaders }));
-    this.express.use((req, res, next) => {
-      this.logger.info(
-        `Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`,
-        next
-      );
-    });
+    // this.express.use((req, res, next) => {
+    //   this.logger.info(
+    //     `Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`,
+    //     next
+    //   );
+    // });
 
     this.express.use(
-      "/",
       createProxyMiddleware({
         logProvider: (provider) => this.logger,
         target: this.config.serverOptions.target,
         changeOrigin: true,
         secure: false,
-        onProxyRes: (proxyRes: IncomingMessage, req: Request, res: Response) =>
-          this.cloner.clone(proxyRes, req, res),
+        selfHandleResponse: true,
+        onProxyRes: responseInterceptor(async (buffer, proxyRes, req, res) => {
+          try {
+            res.setHeader("content-type", "application/json; charset=utf-8");
+            const thing = await this.cloner.clone(
+              res.statusCode,
+              req.method,
+              req.url,
+              req.headers,
+              buffer
+            );
+
+            return thing;
+          } catch {
+            return JSON.stringify({});
+          }
+        }),
       })
     );
 

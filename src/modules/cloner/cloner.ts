@@ -1,30 +1,28 @@
-import { Request, Response } from "express";
 import { promises } from "fs";
-import { Config } from "../config/config";
 import { IConfig } from "../../models/config/config";
-import { IncomingMessage } from "http";
-import { Logger } from "../logger/logger";
+import { IncomingHttpHeaders, IncomingMessage } from "http";
 import { Logger as WinstonLogger } from "winston";
 import deepmerge from "deepmerge";
 import path from "path";
 
 export class Cloner {
-  private config: IConfig;
-  private logger: WinstonLogger;
-  constructor() {
-    this.config = Config.getConfig();
-    this.logger = new Logger().defaultLogger();
-
+  constructor(private config: IConfig, private logger: WinstonLogger) {
     promises.mkdir(this.config.cloner, { recursive: true }).catch((err) => {});
   }
 
-  public async clone(proxyRes: IncomingMessage, req: Request, res: Response) {
-    const statusCode = proxyRes.statusCode;
-    const data = await new Promise((resolve) => {
-      let chunks: any[] = [];
-      proxyRes.on("data", (chunk) => chunks.push(chunk));
-      proxyRes.on("end", () => resolve(chunks.join("")));
-    });
+  public async clone(
+    code: number,
+    method: string,
+    urlpath: string,
+    headers: IncomingHttpHeaders,
+    buffer: Buffer
+  ) {
+    // const statusCode = proxyRes.statusCode;
+    // const data = await new Promise((resolve) => {
+    //   let chunks: any[] = [];
+    //   proxyRes.on("data", (chunk) => chunks.push(chunk));
+    //   proxyRes.on("end", () => resolve(chunks.join("")));
+    // });
 
     const resPath = path.join(
       this.config.cloner,
@@ -32,35 +30,44 @@ export class Cloner {
     );
 
     let file: any;
-    if (await promises.stat(resPath)) {
-      file = require(resPath);
-    } else {
+    try {
+      file = JSON.parse(await promises.readFile(resPath, "utf8"));
+    } catch {
       file = {};
     }
 
-    let responseObj: any = {
-      responses: {
-        [req.method.toLowerCase()]: {
-          headers: req.headers,
-          statusCode: statusCode,
-          data: data,
+    if (file[urlpath.toLowerCase()]) {
+      if (file[urlpath.toLowerCase()][method.toLowerCase()]) {
+        return JSON.stringify(
+          file[urlpath.toLowerCase()][method.toLowerCase()].data
+        );
+      }
+    }
+
+    const dataObj = JSON.parse(buffer.toString("utf8"));
+
+    let responseObj: {
+      [key: string]: {
+        [key: string]: {
+          headers: IncomingHttpHeaders;
+          statusCode: number;
+          data: any;
+        };
+      };
+    } = {
+      [urlpath.toLowerCase()]: {
+        [method.toLowerCase()]: {
+          headers: headers,
+          statusCode: code,
+          data: dataObj,
         },
       },
     };
 
-    req.path
-      .split("/")
-      .reverse()
-      .forEach((part, index, array) => {
-        if (part) {
-          responseObj = {
-            [part]: responseObj,
-          };
-        }
-      });
-
     await promises
-      .writeFile(resPath, JSON.stringify(deepmerge(responseObj, file), null, 4))
+      .writeFile(resPath, JSON.stringify(deepmerge(responseObj, file), null, 2))
       .catch(this.logger.error);
+
+    return JSON.stringify(dataObj);
   }
 }

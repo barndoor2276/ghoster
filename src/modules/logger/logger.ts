@@ -8,12 +8,8 @@ import { dirname } from "path";
 export class Logger {
   private myTransports: any[] = [];
   private logger: winstonLogger;
-  private config: IConfig;
 
-  constructor() {
-    this.config = Config.getConfig();
-    console.info(this.config);
-
+  constructor(private config: IConfig) {
     for (let i of this.config.winston.transports) {
       if (i.type === "file") {
         try {
