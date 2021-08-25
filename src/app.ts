@@ -1,9 +1,8 @@
 import { Server as httpServer } from "http";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { Cloner } from "./modules/cloner/cloner";
-import { IConfig } from "./config/config.json";
+import { IConfig } from "./modules/config/config";
 import { Logger } from "./modules/logger/logger";
-import config from "./modules/config/config";
 import {
   createProxyMiddleware,
   responseInterceptor,
@@ -16,7 +15,6 @@ import cors from "cors";
  */
 export class App {
   private cloner: Cloner;
-  private config: IConfig;
   private express: Express;
   private logger: winstonLogger;
   private server: httpServer;
@@ -24,9 +22,8 @@ export class App {
   /**
    * Initialize the server
    */
-  constructor() {
+  constructor(private config: IConfig) {
     this.express = express();
-    this.config = config;
     this.logger = new Logger(this.config).defaultLogger();
     this.cloner = new Cloner(this.config, this.logger);
     this.MountRoutes();
@@ -41,12 +38,14 @@ export class App {
      */
     this.express.use(express.json());
     this.express.use(express.urlencoded({ extended: false }));
-    this.express.use(cors({ exposedHeaders: this.config.corsHeaders }));
+    this.express.use(
+      cors({ exposedHeaders: this.config.appConfig.corsHeaders })
+    );
 
     this.express.use(
       createProxyMiddleware({
         logProvider: (provider) => this.logger,
-        target: this.config.serverOptions.target,
+        target: this.config.appConfig.serverOptions.target,
         changeOrigin: true,
         secure: false,
         selfHandleResponse: true,
@@ -82,8 +81,8 @@ export class App {
    * Start the server
    */
   public start() {
-    this.server = this.express.listen(this.config.app.port, () => {
-      this.logger.info(`Listening on port ${this.config.app.port}`);
+    this.server = this.express.listen(this.config.appConfig.app.port, () => {
+      this.logger.info(`Listening on port ${this.config.appConfig.app.port}`);
     });
   }
 

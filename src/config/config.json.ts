@@ -1,7 +1,7 @@
 import { resolve } from "path";
 import { ServerOptions } from "http-proxy";
 
-export interface IConfig {
+export interface IAppConfig {
   app: {
     port: number;
   };
@@ -14,7 +14,7 @@ export interface IConfig {
   cloner: string;
 }
 
-export default {
+export const Config = {
   app: {
     port: 8008,
   },
@@ -44,4 +44,4 @@ export default {
     ],
   },
   cloner: resolve(".clones"),
-} as IConfig;
+} as IAppConfig;

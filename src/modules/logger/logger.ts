@@ -1,7 +1,6 @@
 import { existsSync, mkdirSync } from "fs";
 import winston, { createLogger, Logger as winstonLogger } from "winston";
-
-import { IConfig } from "../../config/config.json";
+import { IConfig } from "../config/config";
 import { dirname } from "path";
 
 export class Logger {
@@ -9,7 +8,7 @@ export class Logger {
   private logger: winstonLogger;
 
   constructor(private config: IConfig) {
-    for (let i of this.config.winston.transports) {
+    for (let i of this.config.appConfig.winston.transports) {
       if (i.type === "file") {
         try {
           if (!existsSync(dirname(i.options["filename"]))) {

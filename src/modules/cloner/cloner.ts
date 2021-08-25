@@ -1,12 +1,14 @@
 import { promises } from "fs";
-import { IConfig } from "../../config/config.json";
+import { IConfig } from "../config/config";
 import { IncomingHttpHeaders } from "http";
 import { Logger as WinstonLogger } from "winston";
 import path from "path";
 
 export class Cloner {
   constructor(private config: IConfig, private logger: WinstonLogger) {
-    promises.mkdir(this.config.cloner, { recursive: true }).catch((err) => {});
+    promises
+      .mkdir(this.config.appConfig.cloner, { recursive: true })
+      .catch((err) => {});
   }
 
   public async clone(
@@ -17,8 +19,8 @@ export class Cloner {
     buffer: Buffer
   ) {
     const responseDirectory = path.join(
-      this.config.cloner,
-      `${this.config.targetName}`,
+      this.config.appConfig.cloner,
+      `${this.config.appConfig.targetName}`,
       urlpath.toLowerCase()
     );
 
