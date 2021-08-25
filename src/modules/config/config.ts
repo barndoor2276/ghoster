@@ -1,4 +1,4 @@
-import { IConfig } from "../../models/config/config";
+import { IConfig } from "../../config/config.json";
 
 export class Config {
   private static config: IConfig;

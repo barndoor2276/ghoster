@@ -1,7 +1,7 @@
 import { Server as httpServer } from "http";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { Cloner } from "./modules/cloner/cloner";
-import { IConfig } from "./models/config/config";
+import { IConfig } from "./config/config.json";
 import { Logger } from "./modules/logger/logger";
 import config from "./modules/config/config";
 import {

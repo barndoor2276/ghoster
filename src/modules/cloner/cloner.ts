@@ -1,5 +1,5 @@
 import { promises } from "fs";
-import { IConfig } from "../../models/config/config";
+import { IConfig } from "../../config/config.json";
 import { IncomingHttpHeaders } from "http";
 import { Logger as WinstonLogger } from "winston";
 import path from "path";
