@@ -25,10 +25,6 @@ export class App {
    * Initialize the server
    */
   constructor() {
-    process.on("uncaughtException", (err) => {
-      this.logger.error("global exception: " + err.message);
-    });
-
     this.express = express();
     this.config = config;
     this.logger = new Logger(this.config).defaultLogger();
@@ -46,12 +42,6 @@ export class App {
     this.express.use(express.json());
     this.express.use(express.urlencoded({ extended: false }));
     this.express.use(cors({ exposedHeaders: this.config.corsHeaders }));
-    // this.express.use((req, res, next) => {
-    //   this.logger.info(
-    //     `Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`,
-    //     next
-    //   );
-    // });
 
     this.express.use(
       createProxyMiddleware({
