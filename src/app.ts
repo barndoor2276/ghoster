@@ -2,12 +2,8 @@ import { Server as httpServer } from "http";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { Cloner } from "./modules/cloner/cloner";
 import { IConfig } from "./modules/config/config";
-import { Logger } from "./modules/logger/logger";
-import {
-  createProxyMiddleware,
-  responseInterceptor,
-} from "http-proxy-middleware";
-import { Logger as winstonLogger } from "winston";
+import { LoggingModule, ILogger } from "./modules/logger/logger";
+import { RUN_MODE } from "./models/run-mode";
 import cors from "cors";
 
 /**
@@ -16,7 +12,7 @@ import cors from "cors";
 export class App {
   private cloner: Cloner;
   private express: Express;
-  private logger: winstonLogger;
+  private logger: ILogger;
   private server: httpServer;
 
   /**
@@ -24,9 +20,18 @@ export class App {
    */
   constructor(private config: IConfig) {
     this.express = express();
-    this.logger = new Logger(this.config).defaultLogger();
-    this.cloner = new Cloner(this.config, this.logger);
+    this.logger = new LoggingModule(this.config).defaultLogger();
+    this.cloner = new Cloner(
+      {
+        cloneDir: this.config.appConfig.cloner,
+        mode: this.config.mode,
+        target: this.config.appConfig.serverOptions.target.toString(),
+        targetName: this.config.appConfig.targetName,
+      },
+      this.logger
+    );
     this.MountRoutes();
+    this.logger.info(`Starting app in \'${this.config.mode}\' mode.`);
   }
 
   /**
@@ -42,29 +47,7 @@ export class App {
       cors({ exposedHeaders: this.config.appConfig.corsHeaders })
     );
 
-    this.express.use(
-      createProxyMiddleware({
-        logProvider: (provider) => this.logger,
-        target: this.config.appConfig.serverOptions.target,
-        changeOrigin: true,
-        secure: false,
-        selfHandleResponse: true,
-        onProxyRes: responseInterceptor(async (buffer, proxyRes, req, res) => {
-          try {
-            res.setHeader("content-type", "application/json; charset=utf-8");
-            return await this.cloner.clone(
-              res.statusCode,
-              req.method,
-              req.url,
-              req.headers,
-              buffer
-            );
-          } catch {
-            return JSON.stringify({});
-          }
-        }),
-      })
-    );
+    this.express.use(this.cloner.middleware.bind(this.cloner));
 
     /**
      * ErrorHandler Middleware ** Must be last!
