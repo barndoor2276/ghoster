@@ -1,96 +1,94 @@
-import { IncomingMessage, Server as httpServer } from 'http';
-import express, { Express, NextFunction, Request, Response } from 'express';
-
-import { Cloner } from './modules/cloner/cloner';
-import { IConfig } from './models/config/IConfig';
-import { Logger } from './modules/logger/logger';
-import { default as config } from './modules/config/config';
-import { createProxyMiddleware } from 'http-proxy-middleware';
-import { Logger as winstonLogger } from 'winston';
+import { IncomingMessage, Server as httpServer } from "http";
+import express, { Express, NextFunction, Request, Response } from "express";
+import { json, urlencoded } from "body-parser";
+import { Cloner } from "./modules/cloner/cloner";
+import { IConfig } from "./models/config/config";
+import { Logger } from "./modules/logger/logger";
+import config from "./modules/config/config";
+import { createProxyMiddleware } from "http-proxy-middleware";
+import { Logger as winstonLogger } from "winston";
+import cors from "cors";
 
 /**
  * The App class
  */
 export class App {
-	private bodyParser: any;
-	private cloner: Cloner;
-	private config: IConfig;
-	private cors: any;
-	private express: Express;
-	private logger: winstonLogger;
-	private server: httpServer;
+  private cloner: Cloner;
+  private config: IConfig;
+  private express: Express;
+  private logger: winstonLogger;
+  private server: httpServer;
 
-	/**
-	 * Initialize the server
-	 */
-	constructor() {
-		this.bodyParser = require('body-parser');
-		this.config = config;
-		this.cors = require('cors');
-		this.express = express();
-		this.logger = new Logger().defaultLogger();
-		this.cloner = new Cloner();
-		this.MountRoutes();
-	}
+  /**
+   * Initialize the server
+   */
+  constructor() {
+    process.on("uncaughtException", (err) => {
+      this.logger.error("global exception: " + err.message);
+    });
 
-	/**
-	 * Initialize the server parameters
-	 */
-	private MountRoutes() {
-		/**
-		 * Middleware
-		 */
-		this.express.use(this.bodyParser.json());
-		this.express.use(this.bodyParser.urlencoded({ extended: true }));
-		this.express.use(this.cors({ exposedHeaders: this.config.corsHeaders }));
-		this.express.use((req, res, next) => {
-			this.logger.info(`Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`);
-			next();
-		});
+    this.config = config;
+    this.express = express();
+    this.logger = new Logger().defaultLogger();
+    this.cloner = new Cloner();
+    this.MountRoutes();
+  }
 
-		this.express.use('/', createProxyMiddleware({
-			logProvider: (provider) => this.logger,
-			target: this.config.serverOptions.target,
-			changeOrigin: true,
-			secure: false,
-			onProxyRes: (proxyRes: IncomingMessage, req: Request, res: Response) => this.cloner.clone(proxyRes, req, res)
-		}));
+  /**
+   * Initialize the server parameters
+   */
+  private MountRoutes() {
+    /**
+     * Middleware
+     */
+    this.express.use(json());
+    this.express.use(urlencoded({ extended: true }));
+    this.express.use(cors({ exposedHeaders: this.config.corsHeaders }));
+    this.express.use((req, res, next) => {
+      this.logger.info(
+        `Incoming: [${req.method} ${req.protocol}://${req.ip}${req.path}]`,
+        next
+      );
+    });
 
-		/**
-		 * ErrorHandler Middleware ** Must be last!
-		 */
-		this.express.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-			this.logger.error(err);
-			res.status(500).send({ message: err.message });
-		});
-	}
+    this.express.use(
+      "/",
+      createProxyMiddleware({
+        logProvider: (provider) => this.logger,
+        target: this.config.serverOptions.target,
+        changeOrigin: true,
+        secure: false,
+        onProxyRes: (proxyRes: IncomingMessage, req: Request, res: Response) =>
+          this.cloner.clone(proxyRes, req, res),
+      })
+    );
 
-	/**
-	 * Start the server
-	 */
-	public Start() {
-		process.on('uncaughtException', (err) => {
-			this.logger.error('global exception: ' + err.message);
-		});
-		this.server = this.express.listen(this.config.app.port, (error: Error) => {
-			if (error) {
-				this.logger.error(error);
-			} else {
-				this.logger.info(`Listening on port ${this.config.app.port}`);
-			}
-		});
-	}
+    /**
+     * ErrorHandler Middleware ** Must be last!
+     */
+    this.express.use(
+      (err: Error, req: Request, res: Response, next: NextFunction) => {
+        this.logger.error(err);
+        res.status(500).send({ message: err.message });
+      }
+    );
+  }
 
-	/**
-	 * Stop the server
-	 */
-	public Stop() {
-		this.server.close(() => {
-			this.logger.info("The server has stopped.");
-		});
-	}
+  /**
+   * Start the server
+   */
+  public start() {
+    this.server = this.express.listen(this.config.app.port, () => {
+      this.logger.info(`Listening on port ${this.config.app.port}`);
+    });
+  }
 
-	public GetServer() {
-		return this.server;
-	}
+  /**
+   * Stop the server
+   */
+  public stop() {
+    this.server.close(() => {
+      this.logger.info("The server has stopped.");
+    });
+  }
 }
