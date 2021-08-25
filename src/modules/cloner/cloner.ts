@@ -33,9 +33,7 @@ export class Cloner {
       return JSON.stringify(
         JSON.parse(await promises.readFile(responseFile, "utf8")).data
       );
-    } catch (error) {
-      this.logger.error(error);
-    }
+    } catch (error) {}
 
     const dataObj = JSON.parse(buffer.toString("utf8"));
 

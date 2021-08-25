@@ -53,15 +53,13 @@ export class App {
         onProxyRes: responseInterceptor(async (buffer, proxyRes, req, res) => {
           try {
             res.setHeader("content-type", "application/json; charset=utf-8");
-            const thing = await this.cloner.clone(
+            return await this.cloner.clone(
               res.statusCode,
               req.method,
               req.url,
               req.headers,
               buffer
             );
-
-            return thing;
           } catch {
             return JSON.stringify({});
           }

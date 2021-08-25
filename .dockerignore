@@ -1,7 +1,0 @@
-*
-
-!./src
-!./test
-!./mocha.opts
-!./package*.json
-!./tsconfig*.json
