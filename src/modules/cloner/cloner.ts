@@ -1,13 +1,13 @@
-import { promises } from "fs";
-import { RUN_MODE } from "../../models/run-mode";
-import { IncomingHttpHeaders } from "http";
-import path from "path";
+import { promises } from 'fs';
+import { RUN_MODE } from '../../models/run-mode';
+import { IncomingHttpHeaders } from 'http';
+import path from 'path';
 import {
   createProxyMiddleware,
   responseInterceptor,
-} from "http-proxy-middleware";
-import { RequestHandler } from "express";
-import { ILogger } from "../logger/logger";
+} from 'http-proxy-middleware';
+import { RequestHandler } from 'express';
+import { ILogger } from '../logger/logger';
 
 export interface IClonerConfig {
   cloneDir: string;
@@ -32,7 +32,7 @@ export class Cloner {
       selfHandleResponse: true,
       onProxyRes: responseInterceptor(async (buffer, proxyRes, req, res) => {
         try {
-          res.setHeader("content-type", "application/json; charset=utf-8");
+          res.setHeader('content-type', 'application/json; charset=utf-8');
           return await this.clone(
             res.statusCode,
             req.method,
@@ -54,12 +54,12 @@ export class Cloner {
     headers: IncomingHttpHeaders,
     buffer: Buffer
   ) {
-    const dataObj = JSON.parse(buffer.toString("utf8"));
+    const dataObj = JSON.parse(buffer.toString('utf8'));
 
     if (this.config.mode != RUN_MODE.PROXY) {
       const responseDirectory = path.join(
         this.config.cloneDir,
-        `${this.config.targetName.replace(" ", "_")}`,
+        `${this.config.targetName.replace(' ', '_')}`,
         urlpath.toLowerCase()
       );
 
@@ -72,7 +72,7 @@ export class Cloner {
 
       try {
         const dataString = JSON.stringify(
-          JSON.parse(await promises.readFile(responseFile, "utf8")).data
+          JSON.parse(await promises.readFile(responseFile, 'utf8')).data
         );
         this.logger.info(`[Mirror] ${responseFile}`);
         return dataString;

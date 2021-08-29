@@ -1,10 +1,9 @@
-import { Server as httpServer } from "http";
-import express, { Express, NextFunction, Request, Response } from "express";
-import { Cloner } from "./modules/cloner/cloner";
-import { IConfig } from "./modules/config/config";
-import { LoggingModule, ILogger } from "./modules/logger/logger";
-import { RUN_MODE } from "./models/run-mode";
-import cors from "cors";
+import { Server as httpServer } from 'http';
+import express, { Express, NextFunction, Request, Response } from 'express';
+import { Cloner } from './modules/cloner/cloner';
+import { IConfig } from './modules/config/config';
+import { LoggingModule, ILogger } from './modules/logger/logger';
+import cors from 'cors';
 
 /**
  * The App class
@@ -74,7 +73,7 @@ export class App {
    */
   public stop() {
     this.server.close(() => {
-      this.logger.info("The server has stopped.");
+      this.logger.info('The server has stopped.');
     });
   }
 }

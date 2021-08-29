@@ -1,7 +1,7 @@
-import { existsSync, mkdirSync } from "fs";
-import winston, { createLogger } from "winston";
-import { IConfig } from "../config/config";
-import { dirname } from "path";
+import { existsSync, mkdirSync } from 'fs';
+import winston, { createLogger } from 'winston';
+import { IConfig } from '../config/config';
+import { dirname } from 'path';
 
 export interface ILogger {
   debug: (message: any) => void;
@@ -17,17 +17,17 @@ export class LoggingModule {
 
   constructor(private config: IConfig) {
     for (let i of this.config.appConfig.winston.transports) {
-      if (i.type === "file") {
+      if (i.type === 'file') {
         try {
-          if (!existsSync(dirname(i.options["filename"]))) {
+          if (!existsSync(dirname(i.options['filename']))) {
             mkdirSync(dirname(i.options.filename));
           }
           this.myTransports.push(new winston.transports.File(i.options));
         } catch (ex) {
-          console.error("Error creating Winston file log directory.");
+          console.error('Error creating Winston file log directory.');
           console.error(ex.message);
         }
-      } else if (i.type === "console") {
+      } else if (i.type === 'console') {
         this.myTransports.push(new winston.transports.Console(i.options));
       }
     }
@@ -42,8 +42,8 @@ export class LoggingModule {
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.timestamp({
-          format: "YYYY-MM-DD_HH:mm:ss",
-          alias: "myTime",
+          format: 'YYYY-MM-DD_HH:mm:ss',
+          alias: 'myTime',
         }),
         myFormat
       ),

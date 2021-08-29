@@ -1,5 +1,5 @@
-import { resolve } from "path";
-import { ServerOptions } from "http-proxy";
+import { resolve } from 'path';
+import { ServerOptions } from 'http-proxy';
 
 export interface IAppConfig {
   app: {
@@ -18,30 +18,30 @@ export const Config = {
   app: {
     port: 8008,
   },
-  targetName: "xkcd",
+  targetName: 'xkcd',
   serverOptions: {
-    target: "https://xkcd.com/",
+    target: 'https://xkcd.com/',
   },
-  corsHeaders: ["Link"],
+  corsHeaders: ['Link'],
   winston: {
     transports: [
       {
-        name: "console1",
-        type: "console",
+        name: 'console1',
+        type: 'console',
         options: {
-          level: "debug",
+          level: 'debug',
         },
       },
       {
-        name: "file1",
-        type: "file",
+        name: 'file1',
+        type: 'file',
         options: {
-          level: "debug",
-          filename: "./dist/log/ghoster.log",
+          level: 'debug',
+          filename: './dist/log/ghoster.log',
           tailable: true,
         },
       },
     ],
   },
-  cloner: resolve(".clones"),
+  cloner: resolve('.clones'),
 } as IAppConfig;

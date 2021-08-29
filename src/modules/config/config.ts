@@ -1,5 +1,5 @@
-import { Config, IAppConfig } from "../../config/config.json";
-import { RUN_MODE } from "../../models/run-mode";
+import { Config, IAppConfig } from '../../config/config.json';
+import { RUN_MODE } from '../../models/run-mode';
 
 export interface IConfig {
   appConfig: IAppConfig;
