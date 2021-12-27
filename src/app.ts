@@ -4,6 +4,7 @@ import { Cloner } from './modules/cloner/cloner';
 import { IConfig } from './modules/config/config';
 import { LoggingModule, ILogger } from './modules/logger/logger';
 import cors from 'cors';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 /**
  * The App class
@@ -23,14 +24,12 @@ export class App {
     this.cloner = new Cloner(
       {
         cloneDir: this.config.appConfig.cloner,
-        mode: this.config.mode,
         target: this.config.appConfig.serverOptions.target.toString(),
-        targetName: this.config.appConfig.targetName,
+        targetName: this.config.appConfig.targetName
       },
       this.logger
     );
     this.MountRoutes();
-    this.logger.info(`Starting app in \'${this.config.mode}\' mode.`);
   }
 
   /**
