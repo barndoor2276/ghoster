@@ -1,12 +1,12 @@
-import { promises } from 'fs';
-import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
-import path from 'path';
-import { RequestHandler } from 'express';
-import { ILogger } from '../logger/logger';
+import { promises } from "fs";
+import { ILogger } from "../../models/logger";
+import { IncomingHttpHeaders, OutgoingHttpHeaders } from "http";
+import path from "path";
 import {
   createProxyMiddleware,
-  responseInterceptor
-} from 'http-proxy-middleware';
+  responseInterceptor,
+} from "http-proxy-middleware";
+import { RequestHandler } from "express";
 
 export interface IClonerConfig {
   cloneDir: string;

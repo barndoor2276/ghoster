@@ -1,15 +1,8 @@
-import { existsSync, mkdirSync } from 'fs';
-import winston, { createLogger } from 'winston';
-import { IConfig } from '../config/config';
-import { dirname } from 'path';
-
-export interface ILogger {
-  debug: (message: any) => void;
-  error: (message: any) => void;
-  info: (message: any) => void;
-  warn: (message: any) => void;
-  log: (level: string, message: any) => void;
-}
+import { existsSync, mkdirSync } from "fs";
+import winston, { createLogger } from "winston";
+import { IConfig } from "../config/config";
+import { dirname } from "path";
+import { ILogger } from "../../models/logger";
 
 export class LoggingModule {
   private myTransports: any[] = [];
