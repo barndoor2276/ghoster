@@ -1,5 +1,6 @@
 import { promises } from "fs";
 import { RUN_MODE } from "../../models/run-mode";
+import { ILogger } from "../../models/logger";
 import { IncomingHttpHeaders } from "http";
 import path from "path";
 import {
@@ -7,7 +8,6 @@ import {
   responseInterceptor,
 } from "http-proxy-middleware";
 import { RequestHandler } from "express";
-import { ILogger } from "../logger/logger";
 
 export interface IClonerConfig {
   cloneDir: string;

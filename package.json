@@ -7,6 +7,7 @@
   "scripts": {
     "start": "tsc-watch --onSuccess \"npm run serve\"",
     "build": "npm run clean && tsc -p tsconfig.json",
+    "build-prod": "npm run clean && tsc -p tsconfig.prod.json",
     "clean": "shx rm -Rf dist/*",
     "serve": "node dist/main.js"
   },
@@ -24,17 +25,17 @@
     "@types/cors": "^2.8.12",
     "@types/express": "^4.17.13",
     "@types/http-proxy-middleware": "^0.19.3",
-    "@types/node": "^16.7.1",
+    "@types/node": "^17.0.25",
     "@types/winston": "^2.3.9",
-    "shx": "^0.3.3",
-    "ts-node": "^10.2.1",
-    "tsc-watch": "^4.5.0",
-    "typescript": "^4.3.5"
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "shx": "^0.3.4",
+    "ts-node": "^10.7.0",
+    "tsc-watch": "^5.0.3",
+    "typescript": "^4.6.3",
+    "winston": "^3.7.2"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "http-proxy-middleware": "^2.0.1",
-    "winston": "^3.3.3"
+    "http-proxy-middleware": "^2.0.4"
   }
 }

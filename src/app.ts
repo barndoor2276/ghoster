@@ -2,9 +2,9 @@ import { Server as httpServer } from "http";
 import express, { Express, NextFunction, Request, Response } from "express";
 import { Cloner } from "./modules/cloner/cloner";
 import { IConfig } from "./modules/config/config";
-import { LoggingModule, ILogger } from "./modules/logger/logger";
-import { RUN_MODE } from "./models/run-mode";
+import { LoggingModule } from "./modules/logger/logger";
 import cors from "cors";
+import { ILogger } from "./models/logger";
 
 /**
  * The App class
