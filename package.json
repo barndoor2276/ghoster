@@ -1,6 +1,6 @@
 {
-  "name": "ghoster",
-  "version": "1.0.1",
+  "name": "@bbergan/ghoster",
+  "version": "1.0.2",
   "description": "Web api application to pass requests from guest vm to host.",
   "main": "main.ts",
   "bin": "./dist/main.js",
@@ -9,7 +9,8 @@
     "build": "npm run clean && tsc -p tsconfig.json",
     "build-prod": "npm run clean && tsc -p tsconfig.prod.json",
     "clean": "shx rm -Rf dist/*",
-    "serve": "node dist/main.js"
+    "serve": "node dist/main.js",
+    "prepack": "npm run build-prod"
   },
   "repository": {
     "type": "git",
