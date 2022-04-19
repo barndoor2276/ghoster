@@ -1,6 +1,6 @@
 {
   "name": "@bbergan/ghoster",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Web api application to pass requests from guest vm to host.",
   "main": "main.ts",
   "scripts": {
