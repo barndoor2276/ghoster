@@ -1,17 +1,19 @@
-import { promises } from "fs";
-import { ILogger } from "../../models/logger";
-import { IncomingHttpHeaders, OutgoingHttpHeaders } from "http";
-import path from "path";
+import { promises } from 'fs';
+import { ILogger } from '../../models/logger';
+import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http';
+import path from 'path';
 import {
   createProxyMiddleware,
   responseInterceptor,
-} from "http-proxy-middleware";
-import { RequestHandler } from "express";
+  Options as ProxyOptions
+} from 'http-proxy-middleware';
+import { RequestHandler } from 'express';
 
 export interface IClonerConfig {
   cloneDir: string;
   target: string;
   targetName: string;
+  proxyConfig: RestrictedProxyOptions;
 }
 
 export interface IClonerResponse {
@@ -19,6 +21,16 @@ export interface IClonerResponse {
   data: any;
   statusCode: number;
 }
+
+export type RestrictedProxyOptions = Omit<
+  ProxyOptions,
+  | 'logProvider'
+  | 'target'
+  | 'changeOrigin'
+  | 'secure'
+  | 'selfHandleResponse'
+  | 'onProxyRes'
+>;
 
 export class Cloner {
   private mirrorMiddleware: RequestHandler;
@@ -49,7 +61,7 @@ export class Cloner {
   }
 
   private createClonerMiddleware(): RequestHandler {
-    return createProxyMiddleware({
+    const defaultOpts: ProxyOptions = {
       logProvider: (provider) => this.logger,
       target: this.config.target,
       changeOrigin: true,
@@ -67,7 +79,14 @@ export class Cloner {
         } catch {}
         return buffer.toString('utf8');
       })
-    });
+    };
+
+    const proxyOpts: ProxyOptions = Object.assign(
+      {},
+      this.config.proxyConfig,
+      defaultOpts
+    );
+    return createProxyMiddleware(proxyOpts);
   }
 
   public getMirrorDirectory(url: string): string {
